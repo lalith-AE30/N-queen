@@ -1,141 +1,142 @@
-#include<iostream>
-using namespace std;
-void initialize(int grid[1000][1000],int k,int l)
-{
-    for(int i=0;i<k;i++)
-    {
-        for(int j=0;j<l;j++)
-        grid[i][j]=0;
-    }
-}
-bool is_safe(int grid[1000][1000],int row,int col,int k,int l)
-{
-    //to check row
-    for(int i=0;i<k;i++)
-     {
-         if(grid[row][i]==1)
-         return false;
-     }
-     //to check col
-     for(int j=0;j<l;j++)
-     {
-         if(grid[j][col]==1)
-         return false;
-     }
-     int i=row,j=col;
-     //to check left down diagonals
-     while(true)
-     {
-         if(grid[i][j]==1)
-         {
-         return false;
-         break;
-         }
-         i++;
-         j--;
-         if(i>k-1||j<0)
-         break;
+#include <iostream>
 
-     }
-     i=row;j=col;
-     //to check right down diagonals
-     while(true)
-     {
-            if(grid[i][j]==1)
-         {
-         return false;
-         break;
-         }
-         i++;
-         j++;
-         if(i>k-1||j>k-1)
-         break;
-     }
-     i=row;j=col;
-     //to check left up diagonal
-     while(true)
-     {
-           if(grid[i][j]==1)
-         {
-         return false;
-         break;
-         }
-         i--;
-         j--;
-         if(i<0||j<0)
-         break;
-     }
-     i=row;j=col;
-     //to check right up diagonal
-     while(true)
-     {
-           if(grid[i][j]==1)
-         {
-         return false;
-         break;
-         }
-         i--;
-         j++;
-         if(i<0||j>k-1)
-         break;
-     }
-     return true;
+void initialize(int* grid, int size) {
+    for (int i{ 0 }; i < size; i++) grid[i] = 0;
 }
-bool solfound(int grid[1000][1000],int k,int l)
+
+bool is_safe(int* grid, int row, int col, int total_rows, int total_cols)
 {
-    int a=0;
-    for(int i=0;i<k;i++)
+    // check rows
+    for (int i = 0; i < total_cols; i++)
     {
-        for(int j=0;j<l;j++)
+        if (grid[row*total_cols+i] == 1)
+            return false;
+    }
+    // check cols
+    for (int j = 0; j < total_rows; j++)
+    {
+        if (grid[j*total_cols+col] == 1)
+            return false;
+    }
+
+    // check left-down diag
+    int i = row, j = col;
+    while (true)
+    {
+        if (grid[i*total_cols+j] == 1)
         {
-            if(grid[i][j]==1)
-            a++;
+            return false;
+        }
+        i++;
+        j--;
+        if (i >= total_rows || j < 0)
+            break;
+    }
+
+    // check right-down diag
+    i = row; j = col;
+    while (true)
+    {
+        if (grid[i*total_cols+j] == 1)
+        {
+            return false;
+        }
+        i++;
+        j++;
+        if (i >= total_rows || j >= total_rows)
+            break;
+    }
+
+    // check left-up diag
+    i = row; j = col;
+    while (true)
+    {
+        if (grid[i*total_cols+j] == 1)
+        {
+            return false;
+            break;
+        }
+        i--;
+        j--;
+        if (i < 0 || j < 0)
+            break;
+    }
+
+    // check right-up diag
+    i = row; j = col;
+    while (true)
+    {
+        if (grid[i*total_cols+j] == 1)
+        {
+            return false;
+            break;
+        }
+        i--;
+        j++;
+        if (i < 0 || j >= total_rows)
+            break;
+    }
+    return true;
+}
+
+bool solfound(int* grid, int total_rows, int total_cols)
+{
+    int a = 0;
+    for (int i = 0; i < total_rows; i++)
+    {
+        for (int j = 0; j < total_cols; j++)
+        {
+            if (grid[i*total_cols + j] == 1)
+                a++;
         }
     }
-    if(a==k)
-    return true;
+    if (a == total_rows)
+        return true;
     else
+        return false;
+}
+bool sol(int* grid, int total_rows, int total_cols)
+{
+    if (solfound(grid, total_rows, total_cols))
+        return true;
+    for (int i = 0; i < total_rows; i++)
+    {
+        for (int j = 0; j <total_cols; j++)
+        {
+            if (is_safe(grid, i, j, total_rows, total_cols))
+            {
+                grid[i*total_cols+j] = 1;
+                if (sol(grid, total_rows, total_cols))
+                    return true;
+                grid[i*total_cols+j] = 0;
+            }
+        }
+    }
     return false;
 }
-bool sol(int grid[1000][1000],int k,int l)
+
+void draw(int* grid, int total_rows, int total_cols)
 {
-if(solfound(grid,k,l))
-return true;
-for(int  i=0;i<k;i++)
-{
-    for(int j=0;j<l;j++)
+    for (int i = 0; i < total_rows; i++)
     {
-        if(is_safe(grid,i,j,k,l))
+        for (int j = 0; j < total_cols; j++)
         {
-            grid[i][j]=1;
-            if(sol(grid,k,l))
-            return true;
-            grid[i][j]=0;
+            std::cout << grid[i*total_cols+j] << " ";
         }
+        std::cout << '\n';
     }
 }
-return false;
-}
-void draw(int grid[1000][1000],int k,int l)
-{
-    for(int i=0;i<k;i++)
-    {
-        for(int j=0;j<l;j++)
-        {
-            cout<<grid[i][j]<<" ";
-        }
-        cout<<endl;
-    }
-}
+
 int main()
 {
-    cout<<"enter number of row and col:"<<endl;
-    int i,j;
-    cin>>i>>j;
-    int grid[1000][1000];
-    initialize(grid,i,j);
-    sol(grid,i,j);
-    draw(grid,i,j);
+    std::cout << "enter number of row and col:\n";
+    int i, j;
+    std::cin >> i >> j;
+    int* grid = new int[i * j];
+    initialize(grid, i*j);
+    sol(grid, i, j);
+    draw(grid, i, j);
+    delete[] grid;
     return 0;
 
 }
